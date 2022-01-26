@@ -143,7 +143,7 @@ def retrieve_issues(repo_name: str):
         for label in labels:
             text += ",1" if label in data_item["labels"] else ",0"
     print("Writing to file...")
-    file = open(repo_name.replace('/', '_') + ".csv", 'w+')
+    file = open(repo_name.replace('/', '_') + ".csv", 'w+', encoding="utf-8")
     file.write(text)
     file.close()
 
