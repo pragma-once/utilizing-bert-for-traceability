@@ -11,6 +11,21 @@ def convert_to_csv_field(text):
     text = text.replace('"', '""')
     return '"' + text + '"'
 
+def get_request(url, auth, params={}):
+    while True:
+        try:
+            result = requests.get(
+                url,
+                params=params,
+                auth=auth
+            )
+            if result.status_code == 200:
+                return result
+            else:
+                print("Status code: " + result.status_code + ", retrying...")
+        except ConnectionError:
+            print("Connection error, retrying...")
+
 """
 repo_name: in owner/repo format
 """
@@ -23,7 +38,7 @@ def retrieve_issues(repo_name: str):
     page = 1
     while True:
         print("Retrieving page " + str(page) + "...")
-        result = requests.get(
+        result = get_request(
             "https://api.github.com/repos/" + repo_name + "/issues",
             params={
                 "state": "closed",
@@ -52,7 +67,7 @@ def retrieve_issues(repo_name: str):
             data_item["comments"] = []
             #print("Retrieving comments for " + str(item["number"]) + "...")
             comments = json.loads(
-                requests.get(
+                get_request(
                     item["comments_url"],
                     auth=(github_token.username, github_token.token)
                 ).text
@@ -69,7 +84,7 @@ def retrieve_issues(repo_name: str):
                 data_item["is_pull_request"] = 1
                 #print("Retrieving pull request for " + str(item["number"]) + "...")
                 pr = json.loads(
-                    requests.get(
+                    get_request(
                         item["pull_request"]["url"],
                         auth=(github_token.username, github_token.token)
                     ).text
@@ -80,7 +95,7 @@ def retrieve_issues(repo_name: str):
                 data_item["pull_request_merge_commit_sha"] = ""
             #print("Retrieving events for " + str(item["number"]) + "...")
             events = json.loads(
-                requests.get(
+                get_request(
                     item["events_url"],
                     auth=(github_token.username, github_token.token)
                 ).text
