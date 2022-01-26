@@ -1,9 +1,12 @@
-# To retrieve closed issues from a repository and extract to a csv file.
-# Set the variables in github_token before running.
+"""
+To retrieve closed issues from a repository and extract to a csv file.
+Set the variables in github_token before running.
+"""
 
 import json
 import requests
 import sys
+
 import github_token
 
 def convert_to_csv_field(text):
@@ -22,7 +25,7 @@ def get_request(url, auth, params={}):
             if result.status_code == 200:
                 return result
             else:
-                print("Status code: " + result.status_code + ", retrying...")
+                print("Status code: " + str(result.status_code) + ", retrying...")
         except ConnectionError:
             print("Connection error, retrying...")
 
