@@ -94,7 +94,7 @@ def retrieve_issues(repo_name: str):
                 elif event["event"] == "merged":
                     data_item["events_merged_commit_urls"].append(event["commit_url"])
                 elif "commit_url" in event and event["commit_url"] is not None and len(event["commit_url"]) > 0:
-                    data_item["events_other_commit_urls"].append(event["event"] + ':' + event["commit_url"])
+                    data_item["events_other_commit_events_and_urls"].append(event["event"] + ':' + event["commit_url"])
             data.append(data_item)
 
         page += 1
