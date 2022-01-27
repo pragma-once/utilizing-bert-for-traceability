@@ -28,6 +28,8 @@ def get_request(url, auth, params={}):
                 print("Status code: " + str(result.status_code) + ", retrying...")
         except ConnectionError:
             print("Connection error, retrying...")
+        except:
+            print("Error, retrying...")
 
 """
 repo_name: in owner/repo format
