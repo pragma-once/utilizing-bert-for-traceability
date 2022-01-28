@@ -70,15 +70,15 @@ def retrieve_issues(repo_name: str):
             data_item["body"] = item["body"]
             data_item["comments_count"] = item["comments"]
             data_item["comments"] = []
-            #print("Retrieving comments for " + str(item["number"]) + "...")
-            comments = json.loads(
-                get_request(
-                    item["comments_url"],
-                    auth=(github_token.username, github_token.token)
-                ).text
-            )
-            for comment in comments:
-                data_item["comments"].append(comment["body"])
+            if data_item["comments_count"] > 0:
+                comments = json.loads(
+                    get_request(
+                        item["comments_url"],
+                        auth=(github_token.username, github_token.token)
+                    ).text
+                )
+                for comment in comments:
+                    data_item["comments"].append(comment["body"])
             data_item["labels"] = []
             for label in item["labels"]:
                 label_name = label["name"]
@@ -87,7 +87,6 @@ def retrieve_issues(repo_name: str):
                 data_item["labels"].append(label_name)
             if "pull_request" in item:
                 data_item["is_pull_request"] = 1
-                #print("Retrieving pull request for " + str(item["number"]) + "...")
                 pr = json.loads(
                     get_request(
                         item["pull_request"]["url"],
@@ -98,7 +97,6 @@ def retrieve_issues(repo_name: str):
             else:
                 data_item["is_pull_request"] = 0
                 data_item["pull_request_merge_commit_sha"] = ""
-            #print("Retrieving events for " + str(item["number"]) + "...")
             events = json.loads(
                 get_request(
                     item["events_url"],
