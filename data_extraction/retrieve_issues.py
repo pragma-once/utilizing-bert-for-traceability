@@ -28,6 +28,9 @@ def get_request(url, auth, params={}):
                 print("Status code: " + str(result.status_code) + ", retrying...")
         except ConnectionError:
             print("Connection error, retrying...")
+        except KeyboardInterrupt:
+            if input("Keyboard interrupt, enter e to exit: ") == "e":
+                exit()
         except:
             print("Error, retrying...")
 
