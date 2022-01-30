@@ -20,7 +20,8 @@ def get_request(url, auth, params={}):
             result = requests.get(
                 url,
                 params=params,
-                auth=auth
+                auth=auth,
+                timeout=5
             )
             if result.status_code == 200:
                 return result
