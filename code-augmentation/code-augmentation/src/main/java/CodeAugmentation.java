@@ -12,6 +12,54 @@ import java.util.*;
 
 public class CodeAugmentation
 {
+    public static GenerateAugmentedCodeResult GenerateAugmentedCode(
+            String method,
+            int minimumChangesForOneRound,
+            int maxExtraRounds,
+            boolean enableSwapOperands,
+            boolean enableRenameVariable,
+            boolean enableSwapStatements
+        )
+    {
+        GenerateAugmentedCodeResult result = new GenerateAugmentedCodeResult();
+        MethodDeclaration methodDeclaration = StaticJavaParser.parseMethodDeclaration(method);
+
+        // First attempt
+
+        int swapOperandsChanges = 0, renameVariableChanges = 0, swapStatementsChanges = 0;
+        if (enableSwapOperands)
+            swapOperandsChanges = swapRandomOperandPairs(methodDeclaration, 0.75);
+        if (enableRenameVariable)
+            renameVariableChanges = renameRandomVariables(methodDeclaration, 0.75);
+        if (enableSwapStatements)
+            swapStatementsChanges = swapRandomStatementsInBlocks(methodDeclaration, 2);
+        int changes = swapOperandsChanges + renameVariableChanges + swapStatementsChanges;
+
+        if (changes >= minimumChangesForOneRound)
+            result.generatedMethods.add(methodDeclaration.toString());
+
+        result.firstAttemptSwapOperandsChanges = swapOperandsChanges;
+        result.firstAttemptRenameVariableChanges = renameVariableChanges;
+        result.firstAttemptSwapStatementsChanges = swapStatementsChanges;
+
+        // More rounds based on the first attempt's results
+
+        int moreRounds = Math.min(maxExtraRounds, changes / minimumChangesForOneRound - 1);
+        Random random = new Random();
+        for (int i = 0; i < moreRounds; i++)
+        {
+            methodDeclaration = StaticJavaParser.parseMethodDeclaration(method);
+            if (enableSwapOperands)
+                swapRandomOperandPairs(methodDeclaration, 0.5 + random.nextDouble() * 0.5);
+            if (enableRenameVariable)
+                renameRandomVariables(methodDeclaration, 0.5 + random.nextDouble() * 0.5);
+            if (enableSwapStatements)
+                swapRandomStatementsInBlocks(methodDeclaration, 1 + random.nextDouble() * 9);
+            result.generatedMethods.add(methodDeclaration.toString());
+        }
+        return result;
+    }
+
     /// @return The number of swaps
     public static int swapRandomOperandPairs(MethodDeclaration method, double swap_probability)
     {
@@ -630,17 +678,17 @@ public class CodeAugmentation
             }
             private void addNames(Node n, boolean isGet, boolean isSet)
             {
-                if (n.getClass() == NameExpr.class)
+                if (n instanceof NameExpr)
                 {
                     String name = ((NameExpr) n).getName().asString();
                     addName(name, isGet, isSet);
                 }
-                else if (n.getClass() == SimpleName.class)
+                else if (n instanceof SimpleName)
                 {
                     String name = ((SimpleName) n).asString();
                     addName(name, isGet, isSet);
                 }
-                else if (n.getClass() == Name.class)
+                else if (n instanceof Name)
                 {
                     String names = ((Name) n).asString();
                     for (String name : names.split("\\."))
