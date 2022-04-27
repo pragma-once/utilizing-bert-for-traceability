@@ -6,4 +6,5 @@ public class GenerateAugmentedCodeResult
     public int firstAttemptSwapOperandsChanges = 0;
     public int firstAttemptRenameVariableChanges = 0;
     public int firstAttemptSwapStatementsChanges = 0;
+    public boolean parseFailed = false;
 }

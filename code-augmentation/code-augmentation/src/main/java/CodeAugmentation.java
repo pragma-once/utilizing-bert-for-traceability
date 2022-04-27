@@ -12,7 +12,7 @@ import java.util.*;
 
 public class CodeAugmentation
 {
-    public static GenerateAugmentedCodeResult GenerateAugmentedCode(
+    public static GenerateAugmentedCodeResult generateAugmentedCode(
             String method,
             int minimumChangesForOneRound,
             int maxExtraRounds,
@@ -22,7 +22,16 @@ public class CodeAugmentation
         )
     {
         GenerateAugmentedCodeResult result = new GenerateAugmentedCodeResult();
-        MethodDeclaration methodDeclaration = StaticJavaParser.parseMethodDeclaration(method);
+        MethodDeclaration methodDeclaration;
+        try
+        {
+            methodDeclaration = StaticJavaParser.parseMethodDeclaration(method);
+        }
+        catch (Exception e)
+        {
+            result.parseFailed = true;
+            return result;
+        }
 
         // First attempt
 
@@ -476,6 +485,84 @@ public class CodeAugmentation
             return "_" + result;
         return result;
     }
+    private static HashMap<String, Boolean> reservedNames = null;
+    private static void initializeReservedNames()
+    {
+        if (reservedNames == null)
+        {
+            reservedNames = new HashMap<>();
+
+            reservedNames.put("abstract", true);
+            reservedNames.put("assert", true);
+            reservedNames.put("boolean", true);
+            reservedNames.put("break", true);
+            reservedNames.put("byte", true);
+            reservedNames.put("case", true);
+            reservedNames.put("catch", true);
+            reservedNames.put("char", true);
+            reservedNames.put("class", true);
+            reservedNames.put("const", true);
+
+            reservedNames.put("continue", true);
+            reservedNames.put("default", true);
+            reservedNames.put("do", true);
+            reservedNames.put("double", true);
+            reservedNames.put("else", true);
+            reservedNames.put("enum", true);
+            reservedNames.put("extends", true);
+            reservedNames.put("final", true);
+            reservedNames.put("finally", true);
+            reservedNames.put("float", true);
+
+            reservedNames.put("for", true);
+            reservedNames.put("goto", true);
+            reservedNames.put("if", true);
+            reservedNames.put("implements", true);
+            reservedNames.put("import", true);
+            reservedNames.put("instanceof", true);
+            reservedNames.put("int", true);
+            reservedNames.put("interface", true);
+            reservedNames.put("long", true);
+            reservedNames.put("native", true);
+
+            reservedNames.put("new", true);
+            reservedNames.put("package", true);
+            reservedNames.put("private", true);
+            reservedNames.put("protected", true);
+            reservedNames.put("public", true);
+            reservedNames.put("return", true);
+            reservedNames.put("short", true);
+            reservedNames.put("static", true);
+            reservedNames.put("strictfp", true);
+            reservedNames.put("super", true);
+
+            reservedNames.put("switch", true);
+            reservedNames.put("synchronized", true);
+            reservedNames.put("this", true);
+            reservedNames.put("throw", true);
+            reservedNames.put("throws", true);
+            reservedNames.put("transient", true);
+            reservedNames.put("try", true);
+            reservedNames.put("void", true);
+            reservedNames.put("volatile", true);
+            reservedNames.put("while", true);
+
+            reservedNames.put("true", true);
+            reservedNames.put("false", true);
+            reservedNames.put("null", true);
+        }
+    }
+    public static String getAlternativeNameNonReserved(String name, Random random)
+    {
+        initializeReservedNames();
+        String result = getAlternativeName(name, random);
+        if (reservedNames.containsKey(result))
+        {
+            // For the small number of names that happen to be a reserved word
+            return random.nextBoolean() ? "_" + result : result + "_";
+        }
+        return result;
+    }
     /// @return The number of renames
     public static int renameRandomVariables(MethodDeclaration method, double rename_probability)
     {
@@ -510,7 +597,7 @@ public class CodeAugmentation
                 continue;
             for (int i = 0; i < 10; i++)
             {
-                String new_name = getAlternativeName(item.getKey().getName().asString(), random);
+                String new_name = getAlternativeNameNonReserved(item.getKey().getName().asString(), random);
                 if (usedNames.containsKey(new_name))
                     continue;
                 usedNames.put(new_name, true);
@@ -805,13 +892,22 @@ public class CodeAugmentation
                     blockCurrentFractionMap.put(block, 0);
                     blockCurrentIndexMap.put(block, 0);
                 }
-                if (n.getParentNode().isPresent() && n.getParentNode().get().getClass() == BlockStmt.class)
+                if (n.getParentNode().isPresent() && n.getParentNode().get().getClass() == BlockStmt.class
+                        && (n instanceof Statement)) // Comments cause out of range statement index
                 {
                     BlockStmt block = (BlockStmt) n.getParentNode().get();
 
                     NodeList<Statement> statements = block.getStatements();
+                    int lastIndex = blockCurrentIndexMap.get(block);
                     int i;
-                    for (i = blockCurrentIndexMap.get(block); i < statements.size() && statements.get(i) != n; i++);
+                    for (i = lastIndex; i < statements.size() && statements.get(i) != n; i++);
+                    if (lastIndex + 1 < i)
+                    {
+                        System.out.println(
+                                "[ALERT] The statement index has been incremented more than once."
+                                        + " This could be a bug."
+                        );
+                    }
                     if (i >= statements.size())
                     {
                         // That's unexpected.
@@ -971,7 +1067,8 @@ public class CodeAugmentation
                 // ExplicitConstructorInvocationStmt doesn't exist in a method
                 // TryStmt's catch parameters don't matter as the statements in those blocks won't be moved out.
 
-                if (n.getParentNode().isPresent() && n.getParentNode().get().getClass() == BlockStmt.class)
+                if (n.getParentNode().isPresent() && n.getParentNode().get().getClass() == BlockStmt.class
+                        && (n instanceof Statement)) // Comments cause out of range statement index
                 {
                     BlockStmt block = (BlockStmt) n.getParentNode().get();
 
