@@ -586,6 +586,10 @@ public class CodeAugmentation
                         namesMap.get(declarator).add((NameExpr) n);
                     }
                 }
+                else if (n.getClass() == VariableDeclarator.class)
+                {
+                    usedNames.put(((VariableDeclarator) n).getName().asString(), true);
+                }
             }
         }
         Visitor visitor = new Visitor();
