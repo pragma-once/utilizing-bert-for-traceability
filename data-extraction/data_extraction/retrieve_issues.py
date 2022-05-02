@@ -1,4 +1,5 @@
 """
+Step 1.
 To retrieve closed issues from a repository and extract to a csv file.
 Set the variables in github_token before running.
 """
