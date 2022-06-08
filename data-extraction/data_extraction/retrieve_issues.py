@@ -153,7 +153,7 @@ def retrieve_issues(repo_name: str):
     file.close()
 
 def main():
-    if len(sys.argv) < 2:
+    if len(sys.argv) != 2:
         print("Use: python retrieve_issues.py repo_owner/repo_name")
         exit()
     retrieve_issues(sys.argv[1])
