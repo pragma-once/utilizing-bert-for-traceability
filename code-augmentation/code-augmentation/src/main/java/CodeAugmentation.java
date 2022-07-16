@@ -999,6 +999,7 @@ public class CodeAugmentation
                                 || n instanceof ContinueStmt
                                 || n instanceof ThrowStmt
                                 || n instanceof UnparsableStmt
+                                || n instanceof ExplicitConstructorInvocationStmt
                 )
                 {
                     // This will affect whether some statements are run, splitBlock is done.
