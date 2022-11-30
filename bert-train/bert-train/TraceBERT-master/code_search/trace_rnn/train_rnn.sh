@@ -1,0 +1,16 @@
+python3 train_trace_rnn.py \
+    --data_dir ../data/code_search_net/python \
+    --embd_file_path ./we/proj_embedding.txt \
+    --output_dir ./output \
+    --logging_steps 1000 \
+    --save_steps 10000 \
+    --num_train_epochs 16 \
+    --hidden_dim 128 \
+    --max_seq_len 100 \
+    --per_gpu_train_batch_size 16 \
+    --per_gpu_eval_batch_size 16 \
+    --gradient_accumulation_steps 8 \
+    --learning_rate 1e-4 \
+    --valid_num 200 \
+    --valid_step 10000 \
+    --neg_sampling online

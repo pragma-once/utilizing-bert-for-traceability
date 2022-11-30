@@ -1,0 +1,12 @@
+python3 train_trace_rnn.py \
+    --data_dir ../data/git_data/dbcli/pgcli/ \
+    --output_dir ./output \
+    --embd_file_path ./we/proj_embedding.txt \
+    --exp_name test_rnn \
+    --valid_step 10000 \
+    --logging_steps 100 \
+    --hidden_dim 60 \
+    --max_seq_len 80 \
+    --learning_rate 0.0001 \
+    --num_train_epochs 1000 \
+    --save_steps 50000
