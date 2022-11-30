@@ -1,3 +1,4 @@
+import com.github.javaparser.JavaToken;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -55,12 +56,14 @@ public class Main
     private static void putInRow(
             JSONObject row,
             String code,
+            ArrayList<String> code_tokens,
             int method_non_empty_lines_count,
             int method_removed_non_empty_lines_in_commit_count,
             int method_added_non_empty_lines_in_commit_count
         )
     {
         row.put("code", code);
+        row.put("code_tokens", code_tokens);
         row.put("method_nonempty_lines", method_non_empty_lines_count);
         row.put("removed_nonempty_lines", method_removed_non_empty_lines_in_commit_count);
         row.put("added_nonempty_lines", method_added_non_empty_lines_in_commit_count);
@@ -203,10 +206,19 @@ public class Main
                                     );
                                     if (methodNonEmptyLines < minMethodCommitLines)
                                         continue;
+                                    // Code tokens
+                                    ArrayList<String> codeTokens = new ArrayList<>();
+                                    for (JavaToken javaToken : methodDeclaration.getTokenRange().get())
+                                    {
+                                        String text = javaToken.getText();
+                                        if (!text.isBlank())
+                                            codeTokens.add(text);
+                                    }
                                     // Add the method
                                     putInRow(
                                             row,
                                             methodDeclaration.toString(),
+                                            codeTokens,
                                             methodNonEmptyLines,
                                             0,
                                             methodNonEmptyLines
@@ -303,10 +315,19 @@ public class Main
                                                 continue;
                                             if (((double)allNonEmptyLineChangesInCommit / (double)methodNonEmptyLines) < minMethodCommitLinesFraction)
                                                 continue;
+                                            // Code tokens
+                                            ArrayList<String> codeTokens = new ArrayList<>();
+                                            for (JavaToken javaToken : methodDeclaration.getTokenRange().get())
+                                            {
+                                                String text = javaToken.getText();
+                                                if (!text.isBlank())
+                                                    codeTokens.add(text);
+                                            }
                                             // Add the method
                                             putInRow(
                                                     row,
                                                     methodDeclaration.toString(),
+                                                    codeTokens,
                                                     methodNonEmptyLines,
                                                     removedNonEmptyLinesInCommit,
                                                     addedNonemptyLinesInCommit
