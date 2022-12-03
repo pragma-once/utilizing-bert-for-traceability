@@ -8,6 +8,8 @@ issue-commit and issue-method links.
 # Scripts
 
 Some of the scripts are described below.
+All training parameters are constants defined in `*-train*.py` files
+where `args: TrainArgs` fields are set.
 
 ## Intermediate
 
