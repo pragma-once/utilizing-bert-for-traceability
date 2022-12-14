@@ -5,6 +5,7 @@ Making the most out of BERT for requirements to code traceability using code aug
 # Data Extraction
 
 Tools to extract issue-commit and issue-method data from GitHub repositories.
+Checkout [datasets](https://github.com/pragma-once/tracebert-improved/tree/main/data-extraction#datasets) to get the extracted data.
 
 # Code Augmentation
 
