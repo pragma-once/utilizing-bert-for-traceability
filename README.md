@@ -1,6 +1,6 @@
-# TraceBERT improved
+# Utilizing BERT for requirement-to-code traceability link recovery
 
-Making the most out of BERT for requirements to code traceability using code augmentation and 3-stage training for issue-method data.
+Making the most out of BERT for requirements to code traceability using code augmentation, and 3-stage training for issue-method data.
 
 # Data Extraction
 
@@ -13,7 +13,7 @@ Java code to apply data augmentation on datasets containing Java methods.
 
 # BERT Train
 
-Code for training and testing based on [TraceBERT](https://github.com/jinfenglin/TraceBERT).
+Code for training and testing the model.
 
 # CODFREL
 
