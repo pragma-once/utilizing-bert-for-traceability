@@ -1,5 +1,7 @@
 # Utilizing BERT for requirement-to-code traceability link recovery
 
+[![DOI](https://zenodo.org/badge/452210176.svg)](https://zenodo.org/badge/latestdoi/452210176)
+
 Making the most out of BERT for requirements to code traceability using code augmentation, and 3-stage training for issue-method data.
 
 # Data Extraction
